@@ -2,49 +2,7 @@
 
 
 
-A Django-based Expense Tracker Web Application that helps users manage income and expenses, track balances, and view financial history.
-
-
-
-\## Features
-
-\- Add income and expenses
-
-\- Track balance
-
-\- View transaction history
-
-\- Django admin panel
-
-
-
-\## Tech Stack
-
-\- Django
-
-\- Python
-
-\- SQLite
-
-\- HTML/CSS
-
-
-
-\## Setup
-
-```bash
-
-pip install -r requirements.txt
-
-python manage.py migrate
-
-python manage.py runserver
-
-
-
-
-
-Save and close.
+A Django-based Expense Tracker Web Application that helps users manage income and expenses, track balances, and view financial history in a clean and simple interface.
 
 
 
@@ -52,11 +10,85 @@ Save and close.
 
 
 
-\## 🔹 STEP 3: Add file to Git
+\## ✨ Features
 
 
 
-```bash id="fix4"
+\- ➕ Add income and expense transactions  
 
-git add README.md
+\- 🏷️ Categorize financial entries  
+
+\- 💰 Track real-time balance, total income, and total expenses  
+
+\- 📜 View complete transaction history  
+
+\- 🛠️ Django admin panel for full data management  
+
+\- 💾 Lightweight SQLite database for quick setup  
+
+
+
+\---
+
+
+
+\## 🛠 Tech Stack
+
+
+
+\- \*\*Backend:\*\* Django, Python  
+
+\- \*\*Frontend:\*\* HTML5, CSS3  
+
+\- \*\*Database:\*\* SQLite  
+
+
+
+\---
+
+
+
+\## 📁 Project Structure
+
+
+
+```bash
+
+Tracker-app/
+
+│
+
+├── manage.py
+
+├── expense\_tracker/        # Django project settings
+
+│   ├── settings.py
+
+│   ├── urls.py
+
+│   ├── asgi.py
+
+│   └── wsgi.py
+
+│
+
+├── tracker/                # Main application
+
+│   ├── migrations/
+
+│   ├── admin.py
+
+│   ├── models.py
+
+│   ├── views.py
+
+│   └── urls.py
+
+│
+
+├── templates/
+
+├── static/
+
+└── db.sqlite3
 
