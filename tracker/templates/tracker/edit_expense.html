@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Expense</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        /* CARD */
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+
+        /* FORM */
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        /* BUTTONS */
+        .btn {
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-update {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-update:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-top: 15px;
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .btn-back:hover {
+            text-decoration: underline;
+        }
+
+        /* TOP BADGE */
+        .badge {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1d4ed8;
+            padding: 5px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h1>✏️ Edit Expense</h1>
+        <a href="{% url 'home' %}" class="btn-back">← Back</a>
+    </div>
+
+    <!-- FORM CARD -->
+    <div class="card">
+
+        <span class="badge">Update your transaction</span>
+
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <button type="submit" class="btn btn-update">
+                Update Expense
+            </button>
+        </form>
+
+        <a href="{% url 'home' %}" class="btn-back">
+            ← Return to Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Expenses</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            padding: 30px;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: white;
+            font-size: 14px;
+        }
+
+        .btn-add {
+            background: #16a34a;
+        }
+
+        .btn-back {
+            background: #2563eb;
+        }
+
+        /* TABLE */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+        }
+
+        th {
+            background: #f9fafb;
+            text-align: left;
+            padding: 14px;
+            font-size: 13px;
+        }
+
+        td {
+            padding: 14px;
+            border-top: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        /* BADGES */
+        .badge {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+        }
+
+        .income {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .expense {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        /* ACTIONS */
+        a {
+            text-decoration: none;
+            margin-right: 10px;
+        }
+
+        .edit { color: #2563eb; }
+        .delete { color: #dc2626; }
+
+        /* TOP BAR */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="topbar">
+        <h1>🧾 All Expenses</h1>
+
+        <div>
+            <a href="{% url 'home' %}" class="btn btn-back">Dashboard</a>
+            <a href="{% url 'add_expense' %}" class="btn btn-add">+ Add Expense</a>
+        </div>
+    </div>
+
+    <table>
+        <tr>
+            <th>Title</th>
+            <th>Amount</th>
+            <th>Type</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
+
+        {% for e in expenses %}
+        <tr>
+            <td>{{ e.title }}</td>
+            <td>R {{ e.amount }}</td>
+
+            <td>
+                {% if e.type == "income" %}
+                    <span class="badge income">Income</span>
+                {% else %}
+                    <span class="badge expense">Expense</span>
+                {% endif %}
+            </td>
+
+            <td>{{ e.date }}</td>
+
+            <td>
+                <a class="edit" href="{% url 'edit_expense' e.id %}">Edit</a>
+                <a class="delete" href="{% url 'delete_expense' e.id %}">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
+</div>
+
+</body>
+</html>

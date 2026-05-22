@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Expense</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        /* HEADER BUTTONS */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .btn-back {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-add {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #dc2626;
+            color: white;
+        }
+
+        /* FORM BOX */
+        .form-box {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #16a34a;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #15803d;
+        }
+
+        /* DELETE SECTION */
+        .delete-box {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+
+        <!-- BACK BUTTON -->
+        <a href="{% url 'home' %}" class="btn btn-back">
+            ← Back to Dashboard
+        </a>
+
+        <!-- OPTIONAL QUICK ADD BUTTON -->
+        <a href="{% url 'add_expense' %}" class="btn btn-add">
+            + Add Expense
+        </a>
+
+    </div>
+
+    <!-- FORM -->
+    <div class="form-box">
+
+        <h2>Add Expense / Income</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Save Transaction</button>
+        </form>
+
+    </div>
+
+    <!-- DELETE BUTTON (ONLY SHOW IF editing an object) -->
+    {% if expense %}
+    <div class="delete-box">
+        <form method="POST" action="{% url 'delete_expense' expense.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-delete">
+                Delete This Expense
+            </button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+
+</body>
+</html>

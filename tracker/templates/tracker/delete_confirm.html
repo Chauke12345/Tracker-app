@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delete Expense</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            background: #f4f7fb;
+            color: #1f2937;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 420px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #dc2626;
+            margin-bottom: 10px;
+        }
+
+        .warning {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .expense-box {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .btn {
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-delete {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #b91c1c;
+        }
+
+        .btn-cancel {
+            display: inline-block;
+            margin-top: 15px;
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .btn-cancel:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <h2>⚠️ Delete Expense</h2>
+
+    <div class="warning">
+        This action cannot be undone.
+    </div>
+
+    <div class="expense-box">
+        <p><b>{{ expense.title }}</b></p>
+        <p>Amount: R {{ expense.amount }}</p>
+        <p>Type: {{ expense.type }}</p>
+        <p>Date: {{ expense.date }}</p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-delete">
+            Yes, Delete Permanently
+        </button>
+    </form>
+
+    <a href="{% url 'home' %}" class="btn-cancel">
+        ← Cancel and go back
+    </a>
+
+</div>
+
+</body>
+</html>
