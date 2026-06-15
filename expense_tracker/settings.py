@@ -76,16 +76,16 @@ TEMPLATES = [
 WSGI_APPLICATION = 'expense_tracker.wsgi.application'
 
 
-# 🗄 DATABASE (SQLite - OK for beginner deploy)
 import dj_database_url
 import os
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL')
+    "default": dj_database_url.config(
+        default=os.environ.get("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True
     )
 }
-
 
 # 🔐 PASSWORD VALIDATION
 AUTH_PASSWORD_VALIDATORS = [
