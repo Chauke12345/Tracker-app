@@ -16,33 +16,29 @@ from django.db.models import Q
 
 
 
+
 # ---------------------------------------------------
 # 📊 DASHBOARD / HOME PAGE
 # ---------------------------------------------------
 
+@login_required
 def expense_list(request):
 
-    # 📅 Current month filter
     today = timezone.now()
-    current_month = today.month
-    current_year = today.year
 
-    # 🔥 Monthly filtered transactions (dashboard cards)
     expenses = Expense.objects.filter(
-        date__year=current_year,
-        date__month=current_month
+        user=request.user,
+        date__year=today.year,
+        date__month=today.month
     ).order_by("-date")
 
-    # 💰 Totals for current month
     income = sum(e.amount for e in expenses if e.type == "income")
     expense = sum(e.amount for e in expenses if e.type == "expense")
     balance = income - expense
 
-    # ---------------------------------------------------
-    # 📊 MONTHLY CHART DATA (income + expense properly)
-    # ---------------------------------------------------
     monthly_data = (
         Expense.objects
+        .filter(user=request.user)
         .annotate(month=TruncMonth("date"))
         .values("month")
         .annotate(
@@ -51,6 +47,10 @@ def expense_list(request):
         )
         .order_by("month")
     )
+    # ---------------------------------------------------
+    # 📊 MONTHLY CHART DATA (income + expense properly)
+    # ---------------------------------------------------
+   
 
     months = []
     income_data = []
@@ -101,8 +101,13 @@ def add_expense(request):
 # ---------------------------------------------------
 # ✏️ EDIT EXPENSE
 # ---------------------------------------------------
+@login_required
 def edit_expense(request, id):
-    expense_obj = get_object_or_404(Expense, id=id)
+    expense_obj = get_object_or_404(
+        Expense,
+        id=id,
+        user=request.user
+    )
 
     if request.method == "POST":
         form = ExpenseForm(request.POST, instance=expense_obj)
@@ -118,8 +123,13 @@ def edit_expense(request, id):
 # ---------------------------------------------------
 # 🗑 DELETE EXPENSE
 # ---------------------------------------------------
+@login_required
 def delete_expense(request, id):
-    expense_obj = get_object_or_404(Expense, id=id)
+    expense_obj = get_object_or_404(
+        Expense,
+        id=id,
+        user=request.user
+    )
 
     if request.method == "POST":
         expense_obj.delete()
