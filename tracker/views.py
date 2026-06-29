@@ -21,7 +21,7 @@ from django.db.models import Q
 # 📊 DASHBOARD / HOME PAGE
 # ---------------------------------------------------
 
-@login_required
+@login_required(login_url="/login/")
 def expense_list(request):
 
     today = timezone.now()
@@ -83,7 +83,7 @@ def expense_list(request):
 # ---------------------------------------------------
 # ➕ ADD EXPENSE (LOGIN REQUIRED)
 # ---------------------------------------------------
-@login_required
+@login_required(login_url="/login/")
 def add_expense(request):
     if request.method == "POST":
         form = ExpenseForm(request.POST)
@@ -101,7 +101,7 @@ def add_expense(request):
 # ---------------------------------------------------
 # ✏️ EDIT EXPENSE
 # ---------------------------------------------------
-@login_required
+@login_required(login_url="/login/")
 def edit_expense(request, id):
     expense_obj = get_object_or_404(
         Expense,
@@ -123,7 +123,7 @@ def edit_expense(request, id):
 # ---------------------------------------------------
 # 🗑 DELETE EXPENSE
 # ---------------------------------------------------
-@login_required
+@login_required(login_url="/login/")
 def delete_expense(request, id):
     expense_obj = get_object_or_404(
         Expense,
@@ -159,6 +159,7 @@ def signup(request):
 # ---------------------------------------------------
 class CustomLoginView(LoginView):
     template_name = "tracker/login.html"
+    redirect_authenticated_user = True
 
 
 # ---------------------------------------------------
