@@ -15,23 +15,22 @@ Django settings for expense_tracker project.
 
 from pathlib import Path
 import os
-import os
-
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
-# 🔐 SECURITY
-SECRET_KEY = 'django-insecure-x0v!mvd!+sa@5vyf2tsjav1(9^qie6@(cr86$_)2(dw+d7kj55'
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-# ⚠️ DEBUG (KEEP TRUE FOR FIRST DEPLOY, CHANGE LATER)
-DEBUG = True
+ALLOWED_HOSTS = [
+    "tracker-app-dvyx.onrender.com",
+]
 
-# 🌐 ALLOWED HOSTS (REQUIRED FOR RENDER)
-ALLOWED_HOSTS = ["*"]
+CSRF_TRUSTED_ORIGINS = [
+    "https://tracker-app-dvyx.onrender.com",
+]
 
-
-# 📦 INSTALLED APPS
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -42,8 +41,6 @@ INSTALLED_APPS = [
     'tracker',
 ]
 
-
-# ⚙️ MIDDLEWARE
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -54,15 +51,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
 ROOT_URLCONF = 'expense_tracker.urls'
 
-
-# 🎨 TEMPLATES
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],  # you can add BASE_DIR / "templates" later if needed
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -74,12 +68,7 @@ TEMPLATES = [
     },
 ]
 
-
 WSGI_APPLICATION = 'expense_tracker.wsgi.application'
-
-
-import os
-import dj_database_url
 
 DATABASES = {
     "default": dj_database_url.config(
@@ -87,29 +76,10 @@ DATABASES = {
         conn_max_age=600,
     )
 }
-# 🔐 PASSWORD VALIDATION
-AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
-]
 
-
-# 🌍 INTERNATIONALIZATION
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
-USE_I18N = True
-USE_TZ = True
-
-
-# 📁 STATIC FILES (IMPORTANT FOR RENDER)
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-
-
-# Authentication
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/login/"
