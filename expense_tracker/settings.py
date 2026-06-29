@@ -81,7 +81,10 @@ WSGI_APPLICATION = 'expense_tracker.wsgi.application'
 import os
 import dj_database_url
 
-DATABASE_URL = os.environ["DATABASE_URL"]
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if not DATABASE_URL:
+    raise Exception("DATABASE_URL is missing")
 
 DATABASES = {
     "default": dj_database_url.config(
@@ -111,6 +114,8 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
-# 🔐 LOGIN SETTINGS
-LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/login/"
+
+# Authentication
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "login"
