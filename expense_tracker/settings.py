@@ -13,23 +13,46 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 Django settings for expense_tracker project.
 """
 
+"""
+Django settings for expense_tracker project.
+"""
+
 from pathlib import Path
 import os
 import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
+# ---------------------------------------------------
+# 🔐 SECURITY SETTINGS (FIXED FOR LOCAL + RENDER)
+# ---------------------------------------------------
 
-DEBUG = os.environ.get("DEBUG", "False") == "True"
+# fallback secret key for local dev
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY",
+    "django-insecure-dev-key-change-me"
+)
 
+# safe debug switch (LOCAL = True unless you explicitly set False)
+DEBUG = os.environ.get("DEBUG", "True") == "True"
+
+# allow local + Render
 ALLOWED_HOSTS = [
-    "tracker-app-dvyx.onrender.com",
+    "127.0.0.1",
+    "localhost",
+    ".onrender.com"
 ]
 
+# Render domain for CSRF (keep + local safe)
 CSRF_TRUSTED_ORIGINS = [
     "https://tracker-app-dvyx.onrender.com",
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
 ]
+
+# ---------------------------------------------------
+# APPS
+# ---------------------------------------------------
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -40,6 +63,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'tracker',
 ]
+
+# ---------------------------------------------------
+# MIDDLEWARE
+# ---------------------------------------------------
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -53,10 +80,14 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'expense_tracker.urls'
 
+# ---------------------------------------------------
+# TEMPLATES
+# ---------------------------------------------------
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [],  # ok since you're using app templates
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -70,15 +101,27 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'expense_tracker.wsgi.application'
 
+# ---------------------------------------------------
+# DATABASE (SAFE LOCAL + RENDER)
+# ---------------------------------------------------
+
 DATABASES = {
     "default": dj_database_url.config(
-        default=os.environ.get("DATABASE_URL"),
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         conn_max_age=600,
     )
 }
 
+# ---------------------------------------------------
+# STATIC FILES
+# ---------------------------------------------------
+
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# ---------------------------------------------------
+# AUTH SETTINGS
+# ---------------------------------------------------
 
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"

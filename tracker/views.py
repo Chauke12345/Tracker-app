@@ -141,10 +141,18 @@ def delete_expense(request, id):
 # ---------------------------------------------------
 # 🧾 SIGNUP PAGE
 # ---------------------------------------------------
-from django.http import HttpResponse
-
 def signup(request):
-    return HttpResponse("Signup page is working on Render")
+    if request.method == "POST":
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)   # auto-login after signup
+            return redirect("home")
+    else:
+        form = SignUpForm()
+
+    return render(request, "tracker/signup.html", {"form": form})
+
 
 # ---------------------------------------------------
 # 🔐 LOGIN VIEW (class-based)
@@ -161,3 +169,9 @@ def logout_view(request):
     logout(request)
     return redirect("login")
 
+from django.shortcuts import redirect
+
+def root_redirect(request):
+    if request.user.is_authenticated:
+        return redirect("home")  # or expense_list
+    return redirect("signup")
