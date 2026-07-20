@@ -32,7 +32,6 @@ def expense_list(request):
     upload_message = None
     imported_count = 0
 
-
     # ---------------------------------------------------
     # 📄 BANK STATEMENT UPLOAD (CSV + PDF)
     # ---------------------------------------------------
@@ -41,11 +40,9 @@ def expense_list(request):
 
         uploaded_file = request.FILES.get("statement_file")
 
-
         if uploaded_file:
 
             filename = uploaded_file.name.lower()
-
 
             # ---------------------------------------
             # CSV IMPORT
@@ -62,61 +59,58 @@ def expense_list(request):
                         .splitlines()
                     )
 
-
                     reader = csv.DictReader(decoded_file)
-
 
                     for row in reader:
 
-
                         amount = float(
-                            row.get("Amount", 0)
+                            row.get("Amount", "0")
+                            .replace("R", "")
+                            .replace(",", "")
+                            .strip()
                         )
 
-
                         if amount >= 0:
-
                             transaction_type = "income"
                             category = "salary"
-
                         else:
-
                             transaction_type = "expense"
                             category = "other"
 
+                        transaction_date = datetime.strptime(
+                            row.get("Date"),
+                            "%Y-%m-%d"
+                        ).date()
 
-
-                        Expense.objects.create(
-
-                            user=request.user,
-
-                            title=row.get(
-                                "Description",
-                                "Imported Transaction"
-                            ),
-
-                            amount=abs(amount),
-
-                            category=category,
-
-                            type=transaction_type,
-
-                            date=datetime.strptime(
-                                row["Date"],
-                                "%Y-%m-%d"
-                            ).date()
-
+                        transaction_title = row.get(
+                            "Description",
+                            "Imported Transaction"
                         )
 
+                        exists = Expense.objects.filter(
+                            user=request.user,
+                            title=transaction_title,
+                            amount=abs(amount),
+                            date=transaction_date,
+                        ).exists()
 
-                        imported_count += 1
+                        if not exists:
 
+                            Expense.objects.create(
+                                user=request.user,
+                                title=transaction_title,
+                                amount=abs(amount),
+                                category=category,
+                                type=transaction_type,
+                                date=transaction_date,
+                            )
 
+                            imported_count += 1
 
                     upload_message = (
-                        f"✅ Successfully imported {imported_count} transactions"
+                        f"✅ Imported {imported_count} new transactions. "
+                        "Duplicate transactions were skipped."
                     )
-
 
                 except Exception as e:
 
@@ -124,261 +118,192 @@ def expense_list(request):
                         f"❌ CSV Import failed: {str(e)}"
                     )
 
-
-
             # ---------------------------------------
             # PDF IMPORT
             # ---------------------------------------
 
             elif filename.endswith(".pdf"):
 
-
                 try:
 
                     with pdfplumber.open(uploaded_file) as pdf:
 
-
                         for page in pdf.pages:
-
 
                             text = page.extract_text()
 
-
                             if text:
-
 
                                 lines = text.split("\n")
 
-
                                 for line in lines:
-
 
                                     parts = line.split()
 
-
                                     if len(parts) >= 3:
-
 
                                         try:
 
-
-                                            date = datetime.strptime(
+                                            transaction_date = datetime.strptime(
                                                 parts[0],
                                                 "%d-%m-%Y"
                                             ).date()
 
-
-
                                             amount = float(
                                                 parts[-1]
+                                                .replace(",", "")
                                             )
-
-
 
                                             description = " ".join(
                                                 parts[1:-1]
                                             )
 
-
-
                                             if amount >= 0:
-
                                                 transaction_type = "income"
                                                 category = "salary"
-
                                             else:
-
                                                 transaction_type = "expense"
                                                 category = "other"
 
-
-
-                                            Expense.objects.create(
-
+                                            exists = Expense.objects.filter(
                                                 user=request.user,
-
                                                 title=description,
-
                                                 amount=abs(amount),
+                                                date=transaction_date,
+                                            ).exists()
 
-                                                category=category,
+                                            if not exists:
 
-                                                type=transaction_type,
+                                                Expense.objects.create(
+                                                    user=request.user,
+                                                    title=description,
+                                                    amount=abs(amount),
+                                                    category=category,
+                                                    type=transaction_type,
+                                                    date=transaction_date,
+                                                )
 
-                                                date=date
-
-                                            )
-
-
-                                            imported_count += 1
-
-
+                                                imported_count += 1
 
                                         except ValueError:
-
                                             continue
 
-
-
                     upload_message = (
-                        f"✅ Successfully imported {imported_count} transactions"
+                        f"✅ Imported {imported_count} new transactions. "
+                        "Duplicate transactions were skipped."
                     )
 
-
                 except Exception as e:
-
 
                     upload_message = (
                         f"❌ PDF Import failed: {str(e)}"
                     )
 
-
-
             else:
-
 
                 upload_message = (
                     "❌ Only CSV and PDF files are supported"
                 )
 
-
-
         else:
-
 
             upload_message = (
                 "❌ No file uploaded"
             )
-
-
 
     # ---------------------------------------------------
     # 🧾 CURRENT MONTH TRANSACTIONS
     # ---------------------------------------------------
 
     expenses = Expense.objects.filter(
-
         user=request.user,
-
         date__year=today.year,
-
-        date__month=today.month
-
+        date__month=today.month,
     ).order_by("-date")
-
-
 
     # ---------------------------------------------------
     # 💰 DASHBOARD TOTALS
     # ---------------------------------------------------
 
     income = sum(
-
         e.amount for e in expenses
-
         if e.type == "income"
-
     )
-
 
     expense = sum(
-
         e.amount for e in expenses
-
         if e.type == "expense"
-
     )
-
 
     balance = income - expense
 
+    # ---------------------------------------------------
+    # 📊 ADVANCED ANALYTICS
+    # ---------------------------------------------------
 
+    total_transactions = expenses.count()
+
+    if income > 0:
+        savings_rate = round(
+            (balance / income) * 100,
+            2
+        )
+    else:
+        savings_rate = 0
+
+    largest_expense = expenses.filter(
+        type="expense"
+    ).order_by(
+        "-amount"
+    ).first()
+
+    average_expense = 0
+
+    if total_transactions > 0:
+        average_expense = round(
+            expense / total_transactions,
+            2
+        )
 
     # ---------------------------------------------------
     # 📊 MONTHLY CHART DATA
     # ---------------------------------------------------
 
     monthly_data = (
-
         Expense.objects
-
-        .filter(
-            user=request.user
-        )
-
+        .filter(user=request.user)
+        .annotate(month=TruncMonth("date"))
+        .values("month")
         .annotate(
-            month=TruncMonth("date")
-        )
-
-        .values(
-            "month"
-        )
-
-        .annotate(
-
             income=Sum(
                 "amount",
                 filter=Q(type="income")
             ),
-
             expense=Sum(
                 "amount",
                 filter=Q(type="expense")
-            )
-
+            ),
         )
-
-        .order_by(
-            "month"
-        )
-
+        .order_by("month")
     )
 
-
-
     months = []
-
     income_data = []
-
     expense_data = []
-
     balance_data = []
-
-
 
     for item in monthly_data:
 
-
         inc = item["income"] or 0
-
         exp = item["expense"] or 0
 
-
-
         months.append(
-
-            item["month"].strftime(
-                "%Y-%m"
-            )
-
+            item["month"].strftime("%Y-%m")
         )
 
-
-        income_data.append(
-            float(inc)
-        )
-
-
-        expense_data.append(
-            float(exp)
-        )
-
-
-        balance_data.append(
-            float(inc - exp)
-        )
-
-
+        income_data.append(float(inc))
+        expense_data.append(float(exp))
+        balance_data.append(float(inc - exp))
 
     # ---------------------------------------------------
     # 📦 SEND DATA TO TEMPLATE
@@ -386,46 +311,32 @@ def expense_list(request):
 
     context = {
 
+        # 📊 Advanced Analytics
+        "total_transactions": total_transactions,
+        "savings_rate": savings_rate,
+        "largest_expense": largest_expense,
+        "average_expense": average_expense,
 
+        # 💰 Dashboard Totals
         "expenses": expenses,
-
-
         "income": income,
-
-
         "expense": expense,
-
-
         "balance": balance,
 
-
+        # 📄 Upload Status
         "upload_message": upload_message,
 
-
+        # 📊 Charts
         "months_json": json.dumps(months),
-
-
         "income_json": json.dumps(income_data),
-
-
         "expense_json": json.dumps(expense_data),
-
-
         "balance_json": json.dumps(balance_data),
-
-
     }
 
-
-
     return render(
-
         request,
-
         "tracker/index.html",
-
-        context
-
+        context,
     )
 # ---------------------------------------------------
 # ➕ ADD EXPENSE
@@ -604,3 +515,4 @@ def root_redirect(request):
 
 
     return redirect("signup")
+
