@@ -199,84 +199,194 @@
 
     <h1>💰 Expense Dashboard</h1>
 
-    <!-- CARDS -->
-    <div class="box">
+   <!-- CARDS -->
+<div class="box">
 
-        <div class="card">
-            <h3><i class="fa-solid fa-arrow-up"></i> Income</h3>
-            <p class="income">{{ income }}</p>
-        </div>
-
-        <div class="card">
-            <h3><i class="fa-solid fa-arrow-down"></i> Expense</h3>
-            <p class="expense">{{ expense }}</p>
-        </div>
-
-        <div class="card">
-            <h3><i class="fa-solid fa-wallet"></i> Balance</h3>
-            <p class="balance">{{ balance }}</p>
-        </div>
-
+    <div class="card">
+        <h3><i class="fa-solid fa-arrow-up"></i> Income</h3>
+        <p class="income">{{ income }}</p>
     </div>
 
-    <!-- CHART -->
-    <div>
-        <h2>📊 Monthly Spending</h2>
-        <canvas id="expenseChart"></canvas>
+    <div class="card">
+        <h3><i class="fa-solid fa-arrow-down"></i> Expense</h3>
+        <p class="expense">{{ expense }}</p>
     </div>
 
-    <!-- TABLE -->
-    <div style="margin-top:40px;">
-        <h2>🧾 Transactions</h2>
-
-        <table>
-            <tr>
-                <th>Title</th>
-                <th>Amount</th>
-                <th>Category</th>
-                <th>Type</th>
-                <th>Date</th>
-                <th>Actions</th>
-            </tr>
-
-         {% for e in expenses %}
-<tr>
-
-    <td>{{ e.title }}</td>
-    <td>R {{ e.amount }}</td>
-
-    <td>
-        <span class="category-badge">{{ e.category|title }}</span>
-    </td>
-
-    <td>
-        {% if e.type == "income" %}
-            <span class="type-badge income">
-                <i class="fa-solid fa-circle-up"></i> Income
-            </span>
-        {% else %}
-            <span class="type-badge expense">
-                <i class="fa-solid fa-circle-down"></i> Expense
-            </span>
-        {% endif %}
-    </td>
-
-    <td class="date-cell">
-        <i class="fa-regular fa-calendar"></i>
-        {{ e.date|date:"d M Y" }}
-    </td>
-
-    <td>
-        <div class="action-buttons">
-            <a class="btn btn-edit" href="{% url 'edit_expense' e.id %}">✏ Edit</a>
-            <a class="btn btn-delete" href="{% url 'delete_expense' e.id %}">🗑 Delete</a>
-        </div>
-    </td>
-
-</tr>
-{% endfor %}
-
+    <div class="card">
+        <h3><i class="fa-solid fa-wallet"></i> Balance</h3>
+        <p class="balance">{{ balance }}</p>
     </div>
+
+</div>
+
+
+<!-- BANK STATEMENT UPLOAD -->
+<div class="card" style="margin-bottom:30px;">
+
+    <h3>
+        📄 Upload Bank Statement
+    </h3>
+
+    <p style="color:#6b7280;">
+        Upload your CSV, Excel, or PDF bank statement to import transactions.
+    </p>
+
+    <form method="POST" enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        <input 
+            type="file"
+            name="statement_file"
+            id="statement_file"
+            accept=".csv,.xlsx,.xls,.pdf"
+            required
+        >
+
+        <p id="file-name" style="margin-top:10px;color:#2563eb;"></p>
+
+        <button type="submit" class="btn-add">
+            Upload Statement
+        </button>
+
+    </form>
+
+</div>
+
+    {% if upload_message %}
+        <p style="margin-top:15px;color:green;">
+            {{ upload_message }}
+        </p>
+    {% endif %}
+
+</div>
+
+
+<script>
+document.getElementById("statement_file").addEventListener("change", function(){
+
+    if(this.files.length > 0){
+
+        document.getElementById("file-name").innerHTML =
+        "📄 Selected: " + this.files[0].name;
+
+    }
+
+});
+</script>
+</div>
+
+<!-- CHART -->
+<div>
+    <h2>📊 Monthly Spending</h2>
+    <canvas id="expenseChart"></canvas>
+</div>
+
+
+<!-- TABLE -->
+<div style="margin-top:40px;">
+
+    <h2>🧾 Transactions</h2>
+
+    <table>
+
+        <tr>
+            <th>Title</th>
+            <th>Amount</th>
+            <th>Category</th>
+            <th>Type</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
+
+
+        {% for e in expenses %}
+
+        <tr>
+
+            <td>
+                {{ e.title }}
+            </td>
+
+
+            <td>
+                R {{ e.amount }}
+            </td>
+
+
+            <td>
+                <span class="category-badge">
+                    {{ e.category|title }}
+                </span>
+            </td>
+
+
+            <td>
+
+                {% if e.type == "income" %}
+
+                    <span class="type-badge income">
+                        <i class="fa-solid fa-circle-up"></i>
+                        Income
+                    </span>
+
+                {% else %}
+
+                    <span class="type-badge expense">
+                        <i class="fa-solid fa-circle-down"></i>
+                        Expense
+                    </span>
+
+                {% endif %}
+
+            </td>
+
+
+            <td class="date-cell">
+
+                <i class="fa-regular fa-calendar"></i>
+
+                {{ e.date|date:"d M Y" }}
+
+            </td>
+
+
+            <td>
+
+                <div class="action-buttons">
+
+                    <a class="btn btn-edit"
+                       href="{% url 'edit_expense' e.id %}">
+                        ✏ Edit
+                    </a>
+
+
+                    <a class="btn btn-delete"
+                       href="{% url 'delete_expense' e.id %}">
+                        🗑 Delete
+                    </a>
+
+                </div>
+
+            </td>
+
+
+        </tr>
+
+        {% empty %}
+
+        <tr>
+
+            <td colspan="6" style="text-align:center;">
+                No transactions yet.
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+
+    </table>
 
 </div>
 
