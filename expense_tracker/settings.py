@@ -49,11 +49,13 @@ ALLOWED_HOSTS = [
 
 
 CSRF_TRUSTED_ORIGINS = [
+    "https://tracker-app-pdnvvg.fly.dev",
     "https://tracker-app-dvyx.onrender.com",
     "https://tracker-app.fly.dev",
 ]
 
-
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 # ---------------------------------------------------
 # APPLICATIONS
 # ---------------------------------------------------
